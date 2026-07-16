@@ -47,19 +47,20 @@ class ReviewWidget(QDialog):
         layout.addWidget(self.web, stretch=1)
 
         self.showButton = QPushButton("Show Answer")
+        self.showButton.setShortcut("space")
         self.showButton.clicked.connect(self.show_answer)
         layout.addWidget(self.showButton)
 
         self.buttonsLayout = QHBoxLayout()
 
-        self.again = QPushButton("I Dont know")
+        self.again = QPushButton("Keep as new")
         self.again.setShortcut("1")
-        self.review = QPushButton("I know it well but i want to review in 2 to 3 months")
+        self.review = QPushButton("Suspend Card")
         self.review.setShortcut("2")
-        self.good = QPushButton("I Abolutley know this")
-        self.good.setShortcut("3")
+        #self.good = QPushButton("5-7 Months")
+        #self.good.setShortcut("3")
 
-        for btn in (self.again, self.review, self.good):
+        for btn in (self.again, self.review):
             btn.hide()
             self.buttonsLayout.addWidget(btn)
 
@@ -71,13 +72,14 @@ class ReviewWidget(QDialog):
     def button_action(self):
         self.again.clicked.connect(self.again_funct)
         self.review.clicked.connect(self.review_funct)
-        self.good.clicked.connect(self.good_funct)
+        #self.good.clicked.connect(self.good_funct)
 
     def again_funct(self):
         self.next_card()
 
     def review_funct(self):
-        mw.col.sched.set_due_date([self.card.id], "30-90")
+        #mw.col.sched.set_due_date([self.card.id], "30-90")
+        mw.col.sched.suspend_cards([self.card.id])
         mw.col.save()
         self.next_card()
 
@@ -131,14 +133,13 @@ class ReviewWidget(QDialog):
         self.card = mw.col.get_card(self.card_ids[self.index])
 
         self._render_question(self.card.question())
-        #self.question.setText(self.card.question())
         self._render_web(self.card.answer())
 
         self.web.hide()
         self.question.show()
         self.showButton.show()
 
-        for b in (self.again, self.review, self.good):
+        for b in (self.again, self.review):
             b.hide()
 
         # reproduce el audio de la pregunta (si la carta tiene autoplay)
@@ -155,7 +156,7 @@ class ReviewWidget(QDialog):
         self.web.show()
         self.showButton.hide()
 
-        for b in (self.again, self.review, self.good):
+        for b in (self.again, self.review):
             b.show()
 
         # reproduce el audio de la respuesta
